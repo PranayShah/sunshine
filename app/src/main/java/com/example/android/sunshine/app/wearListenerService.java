@@ -125,7 +125,9 @@ public class wearListenerService extends WearableListenerService {
                     putDataMapReq.getDataMap().putDouble("HIGH", high);
                     putDataMapReq.getDataMap().putDouble("LOW", low);
                     putDataMapReq.getDataMap().putAsset("ICON", asset);
+                    putDataMapReq.getDataMap().putLong("Time",System.currentTimeMillis());
                     PutDataRequest putDataReq = putDataMapReq.asPutDataRequest();
+                    putDataReq.setUrgent();
                     PendingResult<DataApi.DataItemResult> pendingResult =
                             Wearable.DataApi.putDataItem(mGoogleApiClient, putDataReq);
                     pendingResult.setResultCallback(new ResultCallback<DataApi.DataItemResult>() {

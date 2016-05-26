@@ -24,8 +24,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.IntDef;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
 import android.text.format.Time;
@@ -63,15 +61,15 @@ import java.net.URL;
 import java.util.Vector;
 import java.util.concurrent.ExecutionException;
 
-public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
+public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter {
     public final static String TAG = SunshineSyncAdapter.class.getSimpleName();
     public static GoogleApiClient mGoogleApiClientStatic;
     public static final String ACTION_DATA_UPDATED =
             "com.example.android.sunshine.app.ACTION_DATA_UPDATED";
     // Interval at which to sync with the weather, in seconds.
     // 60 seconds (1 minute) * 180 = 3 hours
-    public static final int SYNC_INTERVAL = 60;
-    public static final int SYNC_FLEXTIME = 60;
+    public static final int SYNC_INTERVAL = 60*5;
+    public static final int SYNC_FLEXTIME = SYNC_INTERVAL/3;
     private static final long DAY_IN_MILLIS = 1000 * 60 * 60 * 24;
     private static final int WEATHER_NOTIFICATION_ID = 3004;
 
@@ -89,21 +87,7 @@ public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter implements 
     private static final int INDEX_MIN_TEMP = 2;
     private static final int INDEX_SHORT_DESC = 3;
 
-    @Override
-    public void onConnected(@Nullable Bundle bundle) {
-        Log.i(TAG, "Connected to Google Api Service");
-//        Wearable.DataApi.addListener(googleApiClient, this);
-    }
 
-    @Override
-    public void onConnectionSuspended(int i) {
-        Log.i(TAG, "onConnectionSuspended: ");
-    }
-
-    @Override
-    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-        Log.i(TAG, "onConnectionFailed: ");
-    }
 
     @Retention(RetentionPolicy.SOURCE)
     @IntDef({LOCATION_STATUS_OK, LOCATION_STATUS_SERVER_DOWN, LOCATION_STATUS_SERVER_INVALID,  LOCATION_STATUS_UNKNOWN, LOCATION_STATUS_INVALID})
@@ -481,6 +465,7 @@ public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter implements 
                         putDataMapReq.getDataMap().putDouble("HIGH", high);
                         putDataMapReq.getDataMap().putDouble("LOW", low);
                         putDataMapReq.getDataMap().putAsset("ICON",asset);
+                        putDataMapReq.getDataMap().putLong("Time",System.currentTimeMillis());
                         PutDataRequest putDataReq = putDataMapReq.asPutDataRequest();
                         PendingResult<DataApi.DataItemResult> pendingResult =
                                 Wearable.DataApi.putDataItem(mGoogleApiClientStatic, putDataReq);
